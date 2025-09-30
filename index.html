@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haldane - Automated Program Discovery for AI Systems</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ocean-deep: #0a1628;
+            --ocean-mid: #1e3a5f;
+            --ocean-light: #2e5c8a;
+            --amber-glow: #ff9f1c;
+            --amber-soft: #ffbf69;
+            --amber-bright: #ffd23f;
+            --warm-light: #fbf5e9;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --surface: rgba(10, 22, 40, 0.6);
+            --surface-light: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            background: var(--ocean-deep);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        /* Enhanced Flow Field Background */
+        #flowField {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Floating orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.6;
+            animation: float-orb 20s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        .orb1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle at 30% 30%, var(--amber-glow), transparent);
+            top: 10%;
+            left: -100px;
+            animation-duration: 25s;
+        }
+
+        .orb2 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle at 30% 30%, var(--ocean-light), transparent);
+            top: 50%;
+            right: -50px;
+            animation-duration: 20s;
+            animation-delay: -5s;
+        }
+
+        .orb3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle at 30% 30%, var(--amber-soft), transparent);
+            bottom: 20%;
+            left: 30%;
+            animation-duration: 22s;
+            animation-delay: -10s;
+        }
+
+        @keyframes float-orb {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(100px, -50px) scale(1.1);
+            }
+            66% {
+                transform: translate(-50px, 100px) scale(0.95);
+            }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            padding: 1.2rem 5%;
+            background: linear-gradient(180deg, rgba(10, 22, 40, 0.95) 0%, transparent 100%);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            padding: 0.8rem 5%;
+            background: rgba(10, 22, 40, 0.98);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 200;
+            letter-spacing: 6px;
+            background: linear-gradient(135deg, var(--amber-glow), var(--amber-bright));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { 
+                filter: brightness(1);
+                transform: scale(1);
+            }
+            50% { 
+                filter: brightness(1.3);
+                transform: scale(1.02);
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6rem 5% 2rem;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            background: linear-gradient(to bottom, transparent, rgba(30, 58, 95, 0.3));
+            pointer-events: none;
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 200;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -2px;
+            animation: hero-entrance 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes hero-entrance {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--amber-glow), var(--amber-bright));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 400;
+            display: inline-block;
+            animation: text-shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes text-shimmer {
+            0%, 100% { 
+                filter: brightness(1) hue-rotate(0deg);
+            }
+            50% { 
+                filter: brightness(1.4) hue-rotate(10deg);
+            }
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 300;
+            animation: hero-entrance 1s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+        }
+
+        .code-snippet {
+            background: var(--surface);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 159, 28, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9rem;
+            color: var(--amber-soft);
+            position: relative;
+            overflow: hidden;
+            animation: hero-entrance 1s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both;
+            box-shadow: 0 10px 40px rgba(255, 159, 28, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .code-snippet:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 50px rgba(255, 159, 28, 0.2);
+            border-color: rgba(255, 159, 28, 0.5);
+        }
+
+        .code-snippet::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(circle, rgba(255, 159, 28, 0.1) 0%, transparent 50%);
+            animation: code-pulse 4s linear infinite;
+        }
+
+        @keyframes code-pulse {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, var(--amber-glow), var(--amber-bright));
+            color: var(--ocean-deep);
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: hero-entrance 1s cubic-bezier(0.4, 0, 0.2, 1) 0.6s both;
+            box-shadow: 0 5px 20px rgba(255, 159, 28, 0.3);
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 159, 28, 0.5);
+        }
+
+        .cta-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .video-container {
+            position: relative;
+            border-radius: 20px;
+            background: var(--surface);
+            backdrop-filter: blur(10px);
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid rgba(255, 159, 28, 0.2);
+            animation: hero-entrance 1s cubic-bezier(0.4, 0, 0.2, 1) 0.8s both;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .video-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 159, 28, 0.1) 0%, transparent 100%);
+            animation: video-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes video-glow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        .play-button {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--amber-glow), var(--amber-bright));
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            animation: pulse-scale 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-scale {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255, 159, 28, 0.7);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 20px rgba(255, 159, 28, 0);
+            }
+        }
+
+        .play-button::after {
+            content: '▶';
+            color: var(--ocean-deep);
+            font-size: 1.5rem;
+            margin-left: 5px;
+        }
+
+        .play-button:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 40px rgba(255, 159, 28, 0.6);
+        }
+
+        /* Section Styles */
+        section {
+            padding: 4rem 5%;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            color: var(--amber-glow);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 1rem;
+            font-weight: 400;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 200;
+            margin-bottom: 1.5rem;
+            letter-spacing: -1px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s forwards;
+        }
+
+        .section-title strong {
+            background: linear-gradient(135deg, var(--amber-glow), var(--amber-bright));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 400;
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            margin-bottom: 2.5rem;
+            font-weight: 300;
+            max-width: 700px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s forwards;
+        }
+
+        /* Problem Section */
+        .problem-section {
+            background: linear-gradient(180deg, rgba(30, 58, 95, 0.3), transparent);
+            padding: 3rem 5%;
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .problem-card {
+            background: var(--surface);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(40px) scale(0.95);
+            animation: cardReveal 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            overflow: hidden;
+        }
+
+        @keyframes cardReveal {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .problem-card:nth-child(1) { animation-delay: 0.1s; }
+        .problem-card:nth-child(2) { animation-delay: 0.2s; }
+        .problem-card:nth-child(3) { animation-delay: 0.3s; }
+
+        .problem-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 159, 28, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .problem-card:hover::before {
+            left: 100%;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            background: rgba(255, 159, 28, 0.05);
+            border-color: rgba(255, 159, 28, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .problem-number {
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--ocean-light), var(--amber-glow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 200;
+            margin-bottom: 1rem;
+            animation: number-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes number-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .problem-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            font-weight: 400;
+        }
+
+        .problem-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        /* Solution Section */
+        .solution-section {
+            padding: 3rem 5%;
+            background: linear-gradient(180deg, transparent, rgba(10, 22, 40, 0.5), transparent);
+        }
+
+        .how-it-works {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .process-step {
+            position: relative;
+            padding-left: 4rem;
+            opacity: 0;
+            transform: translateX(-30px);
+            animation: slideIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .process-step:nth-child(1) { animation-delay: 0.2s; }
+        .process-step:nth-child(2) { animation-delay: 0.4s; }
+        .process-step:nth-child(3) { animation-delay: 0.6s; }
+
+        .process-step::before {
+            content: attr(data-step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--amber-glow), var(--amber-bright));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--ocean-deep);
+            box-shadow: 0 5px 20px rgba(255, 159, 28, 0.3);
+            animation: step-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes step-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 5px 20px rgba(255, 159, 28, 0.3);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 8px 25px rgba(255, 159, 28, 0.5);
+            }
+        }
+
+        .process-step h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--amber-soft);
+            font-weight: 400;
+        }
+
+        .process-step p {
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+
+        .discovery-visual {
+            background: var(--surface);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 159, 28, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .discovery-visual::after {
+            content: 'SEARCHING PROGRAM SPACE...';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: var(--amber-glow);
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.3; }
+        }
+
+        /* Big Bet Section */
+        .bet-section {
+            background: var(--surface);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 159, 28, 0.2);
+            border-radius: 30px;
+            margin: 3rem auto;
+            max-width: 900px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .bet-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(255, 159, 28, 0.05) 0%, transparent 40%);
+            animation: slowRotate 15s linear infinite;
+        }
+
+        @keyframes slowRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .bet-content {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            font-weight: 300;
+            position: relative;
+        }
+
+        .bet-content strong {
+            color: var(--amber-soft);
+            font-weight: 400;
+            animation: text-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes text-glow {
+            0%, 100% { text-shadow: 0 0 10px rgba(255, 159, 28, 0.3); }
+            50% { text-shadow: 0 0 20px rgba(255, 159, 28, 0.6); }
+        }
+
+        /* Results Section */
+        .results-section {
+            background: linear-gradient(180deg, transparent, rgba(30, 58, 95, 0.3), transparent);
+            padding: 3rem 5%;
+        }
+
+        .case-studies {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .case-study {
+            background: var(--surface);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(40px) rotateX(-10deg);
+            animation: caseReveal 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            overflow: hidden;
+        }
+
+        @keyframes caseReveal {
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0);
+            }
+        }
+
+        .case-study:nth-child(1) { animation-delay: 0.1s; }
+        .case-study:nth-child(2) { animation-delay: 0.2s; }
+        .case-study:nth-child(3) { animation-delay: 0.3s; }
+
+        .case-study:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: rgba(255, 159, 28, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .case-metric {
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--amber-glow), var(--amber-bright));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 200;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            animation: metric-count 1.5s ease-out;
+        }
+
+        @keyframes metric-count {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .case-metric-label {
+            font-size: 0.875rem;
+            color: var(--amber-soft);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 5rem 5% 6rem;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(180deg, transparent, var(--ocean-deep));
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 50px;
+            background: linear-gradient(to bottom, var(--amber-glow), transparent);
+            animation: line-grow 1s ease-out;
+        }
+
+        @keyframes line-grow {
+            from { height: 0; }
+            to { height: 50px; }
+        }
+
+        .cta-section h2 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 200;
+            margin-bottom: 1rem;
+            letter-spacing: -2px;
+        }
+
+        .email-form {
+            max-width: 500px;
+            margin: 2.5rem auto 0;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .email-input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            background: var(--surface);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .email-input:focus {
+            outline: none;
+            border-color: rgba(255, 159, 28, 0.5);
+            background: rgba(255, 159, 28, 0.05);
+            box-shadow: 0 0 30px rgba(255, 159, 28, 0.2);
+        }
+
+        .email-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .submit-button {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--amber-glow), var(--amber-bright));
+            border: none;
+            border-radius: 30px;
+            color: var(--ocean-deep);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(255, 159, 28, 0.3);
+        }
+
+        .submit-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 159, 28, 0.5);
+        }
+
+        .submit-button:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        /* Stats */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat {
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: statReveal 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .stat:nth-child(1) { animation-delay: 0.8s; }
+        .stat:nth-child(2) { animation-delay: 0.9s; }
+        .stat:nth-child(3) { animation-delay: 1s; }
+
+        @keyframes statReveal {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--amber-glow), var(--amber-bright));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 300;
+            animation: stat-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes stat-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 0.5rem;
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .email-form {
+                flex-direction: column;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            section {
+                padding: 3rem 5%;
+            }
+        }
+
+        /* Enhanced Particle styling */
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, var(--amber-soft), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 10px var(--amber-glow);
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            cursor: pointer;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        .scroll-indicator::before {
+            content: '↓';
+            font-size: 1.5rem;
+            color: var(--amber-soft);
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <!-- Flow Field Canvas -->
+    <canvas id="flowField"></canvas>
+    
+    <!-- Floating orbs -->
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="logo">HALDANE</div>
+            <a href="#cta" class="cta-button">Get Early Access</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Automated <span>Program Discovery</span> for AI Systems</h1>
+                <p class="subtitle">Not another agent builder. A new way to evolve optimal programs from the computational primordial soup.</p>
+                
+                <div class="code-snippet">
+                    <code>discover(task) → optimal_program</code>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value">10M+</div>
+                        <div class="stat-label">Programs Explored</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">100x</div>
+                        <div class="stat-label">Faster Discovery</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">92%</div>
+                        <div class="stat-label">Cost Reduction</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="video-container">
+                <div class="play-button"></div>
+            </div>
+        </div>
+        <div class="scroll-indicator"></div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="problem-section">
+        <div class="container">
+            <div class="section-label">The Challenge</div>
+            <h2 class="section-title">Building AI Systems is <strong>Broken</strong></h2>
+            <p class="section-description">Every team faces the same fundamental problems when trying to build reliable AI systems at scale.</p>
+            
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="problem-number">01</div>
+                    <h3>Endless Prompt Engineering</h3>
+                    <p>Teams spend months tweaking prompts, chasing marginal improvements that rarely translate to production success.</p>
+                </div>
+                
+                <div class="problem-card">
+                    <div class="problem-number">02</div>
+                    <h3>Fragile Agent Architectures</h3>
+                    <p>Complex chains of reasoning that work in demos but break unpredictably when faced with real-world edge cases.</p>
+                </div>
+                
+                <div class="problem-card">
+                    <div class="problem-number">03</div>
+                    <h3>Exponential Complexity</h3>
+                    <p>As systems grow, the interaction space explodes. Manual testing becomes impossible, and reliability plummets.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section class="solution-section">
+        <div class="container">
+            <div class="section-label">Our Approach</div>
+            <h2 class="section-title">Programs that <strong>Evolve</strong></h2>
+            <p class="section-description">Haldane automatically discovers optimal program structures through massive parallel exploration of the solution space.</p>
+            
+            <div class="how-it-works">
+                <div class="process-step" data-step="1">
+                    <h3>Define the Goal</h3>
+                    <p>Specify what success looks like for your AI system - accuracy, latency, cost, or any custom metric.</p>
+                </div>
+                
+                <div class="process-step" data-step="2">
+                    <h3>Explore Program Space</h3>
+                    <p>Our system generates and tests millions of program variations, learning from each iteration.</p>
+                </div>
+                
+                <div class="process-step" data-step="3">
+                    <h3>Deploy Optimal Solution</h3>
+                    <p>Get production-ready code that's been battle-tested across your entire problem space.</p>
+                </div>
+            </div>
+
+            <div class="discovery-visual">
+                <canvas id="discoveryCanvas"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Big Bet Section -->
+    <section>
+        <div class="bet-section">
+            <div class="bet-content">
+                <p>We believe the future of AI development isn't about crafting perfect prompts or designing elegant architectures by hand.</p>
+                <p><strong>It's about discovery.</strong></p>
+                <p>Just as life emerged from the primordial soup through countless iterations and selection, optimal AI programs can emerge from computational exploration at unprecedented scale.</p>
+                <p>This isn't incremental improvement. It's a fundamental shift in how we build intelligent systems.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section">
+        <div class="container">
+            <div class="section-label">Results</div>
+            <h2 class="section-title">Real Impact on <strong>Real Systems</strong></h2>
+            <p class="section-description">Teams using Haldane are shipping AI features faster and more reliably than ever before.</p>
+            
+            <div class="case-studies">
+                <div class="case-study">
+                    <div class="case-metric">87%</div>
+                    <div class="case-metric-label">Accuracy Improvement</div>
+                    <h4>Document Processing Pipeline</h4>
+                    <p>Discovered a novel multi-stage architecture that outperformed hand-crafted solutions by a wide margin.</p>
+                </div>
+                
+                <div class="case-study">
+                    <div class="case-metric">6w→3d</div>
+                    <div class="case-metric-label">Development Time</div>
+                    <h4>Customer Support Agent</h4>
+                    <p>What used to take a team of engineers over a month now happens automatically in under 72 hours.</p>
+                </div>
+                
+                <div class="case-study">
+                    <div class="case-metric">$2.1M</div>
+                    <div class="case-metric-label">Annual Savings</div>
+                    <h4>Financial Analysis System</h4>
+                    <p>Optimized program uses 95% fewer API calls while maintaining accuracy standards.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="cta">
+        <div class="container">
+            <h2>Ready to <span style="background: linear-gradient(135deg, #ff9f1c, #ffd23f); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Evolve</span>?</h2>
+            <p class="subtitle">Join the waitlist for early access to Haldane.</p>
+            
+            <form class="email-form" onsubmit="handleSubmit(event)">
+                <input type="email" class="email-input" placeholder="your@email.com" required>
+                <button type="submit" class="submit-button">Join Waitlist</button>
+            </form>
+        </div>
+    </section>
+
+    <script>
+    // Enhanced Flow Field Animation
+    const canvas = document.getElementById('flowField');
+    const ctx = canvas.getContext('2d');
+
+    // --- CONFIG: tweak these to control particle behavior and appearance ---
+    // Number of particles
+    const PARTICLE_COUNT = 100;
+    // Base speed added to each particle (randomized by PARTICLE_MAX_RANDOM_SPEED)
+    const PARTICLE_BASE_SPEED = 0.5;
+    // Maximum additional random speed (was Math.random() * 1)
+    const PARTICLE_MAX_RANDOM_SPEED = 1.0;
+    // Global multiplier for particle motion (increase to make particles move faster)
+    const PARTICLE_SPEED_MULTIPLIER = .2;
+    // Global multiplier for particle opacity (1 = original, 0.5 = half opacity)
+    const PARTICLE_OPACITY_MULTIPLIER = .2;
+    // Trail / background fade alpha (lower = longer trails, higher = stronger fade)
+    const TRAIL_OPACITY = 0.05;
+    // Time step multiplier for the flow field animation (increase to speed overall field)
+    const TIME_SPEED = 0.008;
+
+    let time = 0;
+    let particles = [];
+    let mouseX = 0;
+    let mouseY = 0;
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Track mouse movement
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        class Particle {
+            constructor() {
+                this.reset();
+                this.y = Math.random() * canvas.height;
+            }
+            
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = -20;
+                // speed now controlled by config constants
+                this.speed = Math.random() * PARTICLE_MAX_RANDOM_SPEED + PARTICLE_BASE_SPEED;
+                this.size = Math.random() * 3 + 1;
+                this.life = 1;
+                this.decay = Math.random() * 0.01 + 0.003;
+                this.vx = 0;
+                this.vy = 0;
+            }
+            
+            update() {
+                // Enhanced flow field influence
+                const angle = (Math.sin(this.x * 0.002 + time) + Math.cos(this.y * 0.002 + time)) * Math.PI;
+                
+                // Mouse interaction
+                const dx = mouseX - this.x;
+                const dy = mouseY - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < 150) {
+                    const force = (150 - dist) / 150;
+                    this.vx += (dx / dist) * force * 0.5;
+                    this.vy += (dy / dist) * force * 0.5;
+                }
+                
+                // apply global speed multiplier so it's easy to tune
+                this.vx += Math.cos(angle) * this.speed * 0.5 * PARTICLE_SPEED_MULTIPLIER;
+                this.vy += Math.sin(angle) * this.speed * 0.5 * PARTICLE_SPEED_MULTIPLIER + this.speed * PARTICLE_SPEED_MULTIPLIER;
+                
+                // Apply damping
+                this.vx *= 0.98;
+                this.vy *= 0.98;
+                
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                this.life -= this.decay;
+                
+                if (this.life <= 0 || this.y > canvas.height || this.x < -50 || this.x > canvas.width + 50) {
+                    this.reset();
+                }
+            }
+            
+            draw() {
+                const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 3);
+                // multiply alpha by PARTICLE_OPACITY_MULTIPLIER for global opacity control
+                gradient.addColorStop(0, `rgba(255, 191, 105, ${this.life * 0.8 * PARTICLE_OPACITY_MULTIPLIER})`);
+                gradient.addColorStop(0.5, `rgba(255, 159, 28, ${this.life * 0.4 * PARTICLE_OPACITY_MULTIPLIER})`);
+                gradient.addColorStop(1, 'transparent');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Create particles using configured count
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+            particles.push(new Particle());
+        }
+
+        function drawFlowField() {
+            // Use configurable trail opacity so you can control how quickly past frames fade
+            ctx.fillStyle = `rgba(10, 22, 40, ${TRAIL_OPACITY})`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw flowing gradients with more intensity
+            for (let i = 0; i < 5; i++) {
+                const gradient = ctx.createLinearGradient(
+                    Math.sin(time + i) * 200,
+                    Math.cos(time + i) * 200,
+                    canvas.width + Math.cos(time + i) * 200,
+                    canvas.height + Math.sin(time + i) * 200
+                );
+                
+                gradient.addColorStop(0, 'rgba(30, 58, 95, 0.03)');
+                gradient.addColorStop(0.5, 'rgba(255, 159, 28, 0.02)');
+                gradient.addColorStop(1, 'rgba(46, 92, 138, 0.03)');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            // Update and draw particles
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            
+            time += TIME_SPEED;
+            requestAnimationFrame(drawFlowField);
+        }
+        
+        drawFlowField();
+
+        // Discovery visualization
+        const discoveryCanvas = document.getElementById('discoveryCanvas');
+        if (discoveryCanvas) {
+            const dCtx = discoveryCanvas.getContext('2d');
+            discoveryCanvas.width = discoveryCanvas.parentElement.offsetWidth - 64;
+            discoveryCanvas.height = 150;
+            
+            let nodes = [];
+            for (let i = 0; i < 20; i++) {
+                nodes.push({
+                    x: Math.random() * discoveryCanvas.width,
+                    y: Math.random() * discoveryCanvas.height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    size: Math.random() * 3 + 1
+                });
+            }
+            
+            function drawDiscovery() {
+                dCtx.fillStyle = 'rgba(10, 22, 40, 0.1)';
+                dCtx.fillRect(0, 0, discoveryCanvas.width, discoveryCanvas.height);
+                
+                // Draw connections
+                dCtx.strokeStyle = 'rgba(255, 159, 28, 0.2)';
+                dCtx.lineWidth = 0.5;
+                
+                nodes.forEach((node, i) => {
+                    nodes.forEach((other, j) => {
+                        if (i < j) {
+                            const dist = Math.sqrt(Math.pow(node.x - other.x, 2) + Math.pow(node.y - other.y, 2));
+                            if (dist < 100) {
+                                dCtx.beginPath();
+                                dCtx.moveTo(node.x, node.y);
+                                dCtx.lineTo(other.x, other.y);
+                                dCtx.globalAlpha = (100 - dist) / 100 * 0.3;
+                                dCtx.stroke();
+                                dCtx.globalAlpha = 1;
+                            }
+                        }
+                    });
+                });
+                
+                // Update and draw nodes
+                nodes.forEach(node => {
+                    node.x += node.vx;
+                    node.y += node.vy;
+                    
+                    if (node.x < 0 || node.x > discoveryCanvas.width) node.vx *= -1;
+                    if (node.y < 0 || node.y > discoveryCanvas.height) node.vy *= -1;
+                    
+                    const gradient = dCtx.createRadialGradient(node.x, node.y, 0, node.x, node.y, node.size * 2);
+                    gradient.addColorStop(0, 'rgba(255, 191, 105, 0.8)');
+                    gradient.addColorStop(1, 'transparent');
+                    
+                    dCtx.fillStyle = gradient;
+                    dCtx.beginPath();
+                    dCtx.arc(node.x, node.y, node.size * 2, 0, Math.PI * 2);
+                    dCtx.fill();
+                });
+                
+                requestAnimationFrame(drawDiscovery);
+            }
+            
+            drawDiscovery();
+        }
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Form handling
+        function handleSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const button = form.querySelector('.submit-button');
+            const input = form.querySelector('.email-input');
+            
+            button.textContent = 'Added to waitlist!';
+            button.style.background = 'linear-gradient(135deg, #2e5c8a, #1e3a5f)';
+            input.value = '';
+            
+            setTimeout(() => {
+                button.textContent = 'Join Waitlist';
+                button.style.background = 'linear-gradient(135deg, #ff9f1c, #ffd23f)';
+            }, 3000);
+        }
+
+        // Enhanced intersection observer for animations
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        document.querySelectorAll('.section-label, .section-title, .section-description, .problem-card, .process-step, .case-study').forEach(el => {
+            if (window.getComputedStyle(el).animation !== 'none') {
+                el.style.animationPlayState = 'paused';
+                observer.observe(el);
+            }
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
