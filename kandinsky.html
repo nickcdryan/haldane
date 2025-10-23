@@ -1316,8 +1316,7 @@
                     </div>
 
                     <div class="controls">
-                        <button id="playBtn">PLAY</button>
-                        <button id="resetBtn">RESET</button>
+                        <button id="runBtn">RUN</button>
                     </div>
 
                     
@@ -1518,7 +1517,7 @@
         let edges = [];
         let isPlaying = false;
         let animationId = null;
-        let speed = 9.5;
+        let speed = 10;
         let nextNodeY = 50;
         let exploreRate = 100; // Start with pure exploration
         let exploitRate = 0;
@@ -1538,7 +1537,7 @@
         const MAX_ROWS = 12; // Cap exploration rows
         const DIAGRAM_COUNT = 28; // Total number of schematic variants
         const FADE_STEP = 0.05; // Opacity reduction per iteration
-        const MIN_NODE_OPACITY = 0.15; // Minimum opacity so old dots remain visible
+        const MIN_NODE_OPACITY = 0.85; // Minimum opacity so old dots remain visible
 
         // Function to draw schematic system diagrams
         function drawSystemDiagram(index) {
@@ -2042,6 +2041,12 @@
                     ctx.shadowBlur = 0;
                 }
 
+                // Occlude edges behind the node body so lines don't show through faded nodes
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, NODE_RADIUS, 0, Math.PI * 2);
+                ctx.fill();
+
                 // Node color based on type and fitness
                 if (this.isBest) {
                     ctx.fillStyle = `rgba(255, 214, 0, ${effectiveAlpha})`; // k-yellow for best
@@ -2316,13 +2321,14 @@
             // Draw edges
             edges.forEach(edge => {
                 const alpha = Math.min(edge.from.appearAnimation, edge.to.appearAnimation);
+                const fadeWithNode = (edge.to && typeof edge.to.opacity === 'number') ? edge.to.opacity : 1;
                 
                 if (edge.secondary) {
-                    ctx.strokeStyle = `rgba(41, 121, 255, ${0.25 * alpha})`;
+                    ctx.strokeStyle = `rgba(41, 121, 255, ${0.25 * alpha * fadeWithNode})`;
                     ctx.setLineDash([5, 5]);
                 } else {
                     const brightness = Math.max(0.2, edge.to.fitness);
-                    ctx.strokeStyle = `rgba(0, 0, 0, ${brightness * 0.4 * alpha})`;
+                    ctx.strokeStyle = `rgba(0, 0, 0, ${brightness * 0.4 * alpha * fadeWithNode})`;
                     ctx.setLineDash([]);
                 }
                 
@@ -2387,25 +2393,10 @@
                 evolutionInterval = null;
             }
             isPlaying = false;
-            document.getElementById('playBtn').textContent = 'PLAY';
         }
 
-        // Controls
-        document.getElementById('playBtn').addEventListener('click', () => {
-            isPlaying = !isPlaying;
-            
-            if (isPlaying) {
-                document.getElementById('playBtn').textContent = 'PAUSE';
-                startEvolution();
-            } else {
-                document.getElementById('playBtn').textContent = 'PLAY';
-                stopEvolution();
-            }
-        });
-
-        document.getElementById('resetBtn').addEventListener('click', () => {
+        function resetVisualization() {
             stopEvolution();
-            
             iteration = 0;
             nodes = [];
             edges = [];
@@ -2416,13 +2407,22 @@
             exploreRate = 100;
             exploitRate = 0;
             occupiedPositions = {};
-            
             document.getElementById('exploreBar').style.width = '100%';
             document.getElementById('exploitBar').style.width = '0%';
             document.getElementById('diagramOverlay').classList.remove('visible');
-            
             updateStats();
             draw();
+        }
+
+        function runVisualization() {
+            resetVisualization();
+            isPlaying = true;
+            startEvolution();
+        }
+
+        // Controls
+        document.getElementById('runBtn').addEventListener('click', () => {
+            runVisualization();
         });
 
         // speed is fixed via code; no user control
@@ -2431,28 +2431,22 @@
         updateStats();
         animate(); // Always animating for smooth effects
 
-        // Autoplay when visualization enters viewport
+        // Autoplay once when visualization enters viewport
         const vizSection = document.getElementById('treeCanvas');
+        let hasAutoplayed = false;
         if ('IntersectionObserver' in window && vizSection) {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        if (!isPlaying) {
-                            isPlaying = true;
-                            const playBtn = document.getElementById('playBtn');
-                            if (playBtn) playBtn.textContent = 'PAUSE';
-                            startEvolution();
-                        }
+                    if (entry.isIntersecting && !hasAutoplayed) {
+                        hasAutoplayed = true;
+                        runVisualization();
                     }
                 });
             }, { threshold: 0.3 });
             observer.observe(vizSection);
         } else {
             // Fallback: start immediately
-            isPlaying = true;
-            const playBtn = document.getElementById('playBtn');
-            if (playBtn) playBtn.textContent = 'PAUSE';
-            startEvolution();
+            runVisualization();
         }
     </script>
 </body>
