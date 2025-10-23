@@ -1075,14 +1075,15 @@
             gap: 3rem;
             padding: 2rem;
             background: rgba(255, 255, 255, 0.95);
-            border: 1px solid var(--black);
+            border: none;
         }
 
         .canvas-container { position: relative; }
+        .canvas-col { display: flex; align-items: flex-start; }
 
         #treeCanvas {
-            border: 1px solid var(--black);
-            background: var(--gray-1);
+            border: none;
+            background: transparent;
         }
 
         .diagram-overlay {
@@ -1108,10 +1109,10 @@
             letter-spacing: 1px;
             margin-bottom: 0.5rem;
             padding-bottom: 0.25rem;
-            border-bottom: 1px solid var(--black);
+            border-bottom: none;
         }
         .diagram-fitness { color: var(--k-blue); float: right; }
-        #diagramCanvas { border: 1px solid var(--black); background: var(--gray-1); }
+        #diagramCanvas { border: none; background: transparent; }
 
         .axis-label {
             position: absolute;
@@ -1127,12 +1128,12 @@
             width: 280px;
             padding: 1.5rem;
             background: var(--white);
-            border: 1px solid var(--black);
+            border: none;
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
         }
-        .stat-item { border-bottom: 1px solid var(--gray-2); padding-bottom: 1rem; }
+        .stat-item { border-bottom: none; padding-bottom: 1rem; }
         .stat-item:last-child { border-bottom: none; }
         .stat-label { font-size: 0.75rem; color: var(--gray-4); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
         .stat-value { font-size: 2rem; color: var(--black); font-weight: 700; }
@@ -1170,13 +1171,17 @@
         .speed-control { margin-top: 1rem; }
         .speed-slider { width: 100%; margin-top: 0.5rem; }
 
-        .legend { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-2); }
+        .legend { margin-top: 1.5rem; padding-top: 1.5rem; border-top: none; }
         .legend-item { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; font-size: 0.875rem; color: var(--gray-4); }
-        .legend-circle { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--black); }
+        .legend-circle { width: 12px; height: 12px; border-radius: 50%; border: none; }
 
         .visualization-container .title { text-align: center; margin-bottom: 2rem; }
         .visualization-container .title h2 { font-size: 1.25rem; color: var(--black); margin-bottom: 0.5rem; letter-spacing: 2px; font-weight: 700; }
         .visualization-container .subtitle { color: var(--gray-4); font-size: 0.875rem; }
+        /* Allow same title styles when placed above the container */
+        .viz-title .title { text-align: center; margin-bottom: 2rem; }
+        .viz-title .title h2 { font-size: 1.25rem; color: var(--black); margin-bottom: 0.5rem; letter-spacing: 2px; font-weight: 700; }
+        .viz-title .subtitle { color: var(--gray-4); font-size: 0.875rem; }
     </style>
 </head>
 <body>
@@ -1260,12 +1265,9 @@
     <!-- Full Visualization Section (replacing inline preview) -->
     <section>
         <div class="container">
+
             <div class="visualization-container">
-                <div>
-                    <div class="title">
-                        <h2>PROGRAM LINEAGE TREE</h2>
-                        <div class="subtitle">Evolution through exploration and exploitation</div>
-                    </div>
+                <div class="canvas-col">
                     <div class="canvas-container">
                         <canvas id="treeCanvas" width="900" height="600"></canvas>
                         <div class="diagram-overlay" id="diagramOverlay">
@@ -1274,8 +1276,7 @@
                             </div>
                             <canvas id="diagramCanvas" width="200" height="100"></canvas>
                         </div>
-                        <div class="axis-label x-axis-label">ITERATIONS →</div>
-                        <div class="axis-label y-axis-label">PROGRAMS</div>
+
                     </div>
                 </div>
 
@@ -1285,10 +1286,7 @@
                         <div class="stat-value" id="iterationCount">0</div>
                     </div>
                     
-                    <div class="stat-item">
-                        <div class="stat-label">Total Programs</div>
-                        <div class="stat-value secondary small" id="programCount">0</div>
-                    </div>
+                    
                     
                     <div class="stat-item">
                         <div class="stat-label">Best Fitness</div>
@@ -1299,7 +1297,6 @@
                     </div>
                     
                     <div class="stat-item">
-                        <div class="stat-label">Strategy Balance</div>
                         <div class="strategy-indicator">
                             <div>
                                 <div class="strategy-bar explore">
@@ -1321,34 +1318,9 @@
                         <button id="resetBtn">RESET</button>
                     </div>
 
-                    <div class="speed-control">
-                        <div class="stat-label">Speed</div>
-                        <input type="range" id="speedSlider" class="speed-slider" min="1" max="10" value="5">
-                    </div>
+                    
 
-                    <div class="legend">
-                        <div class="stat-label">Legend</div>
-                        <div class="legend-item">
-                            <div class="legend-circle" style="background: rgba(0, 0, 0, 0.2)"></div>
-                            <span>Low Fitness</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-circle" style="background: rgba(0, 0, 0, 0.6)"></div>
-                            <span>Medium Fitness</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-circle" style="background: rgba(0, 0, 0, 1)"></div>
-                            <span>High Fitness</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-circle" style="background: #FF6D00"></div>
-                            <span>New Exploration</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-circle" style="background: #2979FF"></div>
-                            <span>Elite Program</span>
-                        </div>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -1544,7 +1516,7 @@
         let edges = [];
         let isPlaying = false;
         let animationId = null;
-        let speed = 5;
+        let speed = 9;
         let nextNodeY = 50;
         let exploreRate = 100; // Start with pure exploration
         let exploitRate = 0;
@@ -2212,16 +2184,6 @@
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Draw grid lines for reference
-            ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)';
-            ctx.lineWidth = 1;
-            for (let x = LEFT_MARGIN; x < canvas.width; x += X_SPACING) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, canvas.height);
-                ctx.stroke();
-            }
-            
             // Draw edges
             edges.forEach(edge => {
                 const alpha = Math.min(edge.from.appearAnimation, edge.to.appearAnimation);
@@ -2265,7 +2227,6 @@
 
         function updateStats() {
             document.getElementById('iterationCount').textContent = iteration;
-            document.getElementById('programCount').textContent = nodes.length;
             document.getElementById('bestFitness').textContent = bestFitness.toFixed(3);
             document.getElementById('fitnessBar').style.width = `${bestFitness * 100}%`;
         }
@@ -2335,16 +2296,35 @@
             draw();
         });
 
-        document.getElementById('speedSlider').addEventListener('input', (e) => {
-            speed = parseInt(e.target.value);
-            if (isPlaying) {
-                startEvolution(); // Restart with new speed
-            }
-        });
+        // speed is fixed via code; no user control
 
         // Initialize and start animation loop
         updateStats();
         animate(); // Always animating for smooth effects
+
+        // Autoplay when visualization enters viewport
+        const vizSection = document.getElementById('treeCanvas');
+        if ('IntersectionObserver' in window && vizSection) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        if (!isPlaying) {
+                            isPlaying = true;
+                            const playBtn = document.getElementById('playBtn');
+                            if (playBtn) playBtn.textContent = 'PAUSE';
+                            startEvolution();
+                        }
+                    }
+                });
+            }, { threshold: 0.3 });
+            observer.observe(vizSection);
+        } else {
+            // Fallback: start immediately
+            isPlaying = true;
+            const playBtn = document.getElementById('playBtn');
+            if (playBtn) playBtn.textContent = 'PAUSE';
+            startEvolution();
+        }
     </script>
 </body>
 </html>
