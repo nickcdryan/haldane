@@ -1532,7 +1532,7 @@
         const X_SPACING = 56;
         const Y_SPACING = 40; // Increased spacing
         const MIN_Y_DISTANCE = 28; // Minimum distance between nodes at same X
-        const NODE_RADIUS = 5;
+        const NODE_RADIUS = 6;
         const LEFT_MARGIN = 30;
         const TOP_MARGIN = 50;
 
@@ -1924,7 +1924,7 @@
 
             draw() {
                 const alpha = Math.min(1, this.appearAnimation);
-                const radius = NODE_RADIUS + (this.pulseAnimation * 10);
+                const radius = NODE_RADIUS + (this.pulseAnimation * 12);
 
                 // Draw pulse if animating
                 if (this.pulseAnimation > 0) {
