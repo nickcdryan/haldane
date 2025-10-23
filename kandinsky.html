@@ -606,7 +606,8 @@
             position: relative;
             background: rgba(255, 255, 255, 0.95);
         }
-        .viz-section { padding-top: 2rem; }
+        .viz-section { padding-top: 2rem; padding-left: 4%; padding-right: 4%; }
+        .viz-section .container { margin-left: 0; margin-right: auto; }
 
         .container {
             max-width: 1200px;
@@ -1270,7 +1271,7 @@
             <div class="visualization-container">
                 <div class="canvas-col">
                     <div class="canvas-container">
-                        <canvas id="treeCanvas" width="900" height="700"></canvas>
+                        <canvas id="treeCanvas" width="1000" height="700"></canvas>
                         <div class="diagram-overlay" id="diagramOverlay">
                             <div class="diagram-header">
                                 BEST PROGRAM <span class="diagram-fitness" id="diagramFitness">0.000</span>
@@ -1528,11 +1529,11 @@
         // Track occupied positions for better spacing
         let occupiedPositions = {};
         
-        const X_SPACING = 50;
-        const Y_SPACING = 35; // Increased spacing
-        const MIN_Y_DISTANCE = 25; // Minimum distance between nodes at same X
-        const NODE_RADIUS = 4;
-        const LEFT_MARGIN = 50;
+        const X_SPACING = 56;
+        const Y_SPACING = 40; // Increased spacing
+        const MIN_Y_DISTANCE = 28; // Minimum distance between nodes at same X
+        const NODE_RADIUS = 5;
+        const LEFT_MARGIN = 30;
         const TOP_MARGIN = 50;
 
         // Function to draw 20 different system diagrams
