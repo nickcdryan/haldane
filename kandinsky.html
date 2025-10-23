@@ -606,6 +606,7 @@
             position: relative;
             background: rgba(255, 255, 255, 0.95);
         }
+        .viz-section { padding-top: 2rem; }
 
         .container {
             max-width: 1200px;
@@ -1263,13 +1264,13 @@
     </section>
 
     <!-- Full Visualization Section (replacing inline preview) -->
-    <section>
+    <section class="viz-section">
         <div class="container">
 
             <div class="visualization-container">
                 <div class="canvas-col">
                     <div class="canvas-container">
-                        <canvas id="treeCanvas" width="900" height="600"></canvas>
+                        <canvas id="treeCanvas" width="900" height="700"></canvas>
                         <div class="diagram-overlay" id="diagramOverlay">
                             <div class="diagram-header">
                                 BEST PROGRAM <span class="diagram-fitness" id="diagramFitness">0.000</span>
@@ -1516,7 +1517,7 @@
         let edges = [];
         let isPlaying = false;
         let animationId = null;
-        let speed = 9;
+        let speed = 9.5;
         let nextNodeY = 50;
         let exploreRate = 100; // Start with pure exploration
         let exploitRate = 0;
