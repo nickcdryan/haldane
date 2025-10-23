@@ -1143,13 +1143,13 @@
         .stat-value.small { font-size: 1.5rem; }
 
         .progress-bar { width: 100%; height: 4px; background: var(--gray-2); border-radius: 2px; overflow: hidden; margin-top: 0.5rem; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--k-blue) 0%, var(--k-yellow) 100%); transition: width 0.3s ease; }
+        .progress-fill { height: 100%; background: linear-gradient(to right, var(--k-red), var(--k-blue), var(--k-yellow)); transition: width 0.3s ease; }
 
         .strategy-indicator { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
         .strategy-bar { flex: 1; height: 20px; background: var(--gray-2); position: relative; overflow: hidden; }
         .strategy-fill { height: 100%; transition: width 0.3s ease; }
-        .strategy-bar.explore .strategy-fill { background: var(--k-orange); }
-        .strategy-bar.exploit .strategy-fill { background: var(--k-blue); }
+        .strategy-bar.explore .strategy-fill { background: var(--gray-4); }
+        .strategy-bar.exploit .strategy-fill { background: var(--gray-4); }
         .strategy-label { font-size: 0.65rem; margin-top: 0.25rem; text-align: center; }
 
         .controls { display: flex; gap: 1rem; margin-top: 1rem; }
@@ -1535,6 +1535,8 @@
         const NODE_RADIUS = 6;
         const LEFT_MARGIN = 30;
         const TOP_MARGIN = 50;
+        const FADE_STEP = 0.05; // Opacity reduction per iteration
+        const MIN_NODE_OPACITY = 0.15; // Minimum opacity so old dots remain visible
 
         // Function to draw 20 different system diagrams
         function drawSystemDiagram(index) {
@@ -1906,6 +1908,7 @@
                 this.isBest = false;
                 this.childrenCount = 0; // Track number of children for spacing
                 this.diagramIndex = Math.floor(fitness * 19); // Map fitness to diagram
+                this.opacity = 1; // Start fully opaque; will fade over iterations
             }
 
             update() {
@@ -1925,20 +1928,21 @@
             draw() {
                 const alpha = Math.min(1, this.appearAnimation);
                 const radius = NODE_RADIUS + (this.pulseAnimation * 12);
+                const effectiveAlpha = alpha * this.opacity;
 
                 // Draw pulse if animating
                 if (this.pulseAnimation > 0) {
-                    ctx.fillStyle = `rgba(0, 255, 136, ${this.pulseAnimation * 0.3})`;
+                    ctx.fillStyle = `rgba(0, 255, 136, ${this.pulseAnimation * 0.3 * this.opacity})`;
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, radius + 5, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
-                // Special highlight for best node
+                // Special highlight for best node (yellow theme)
                 if (this.isBest) {
-                    ctx.shadowColor = '#FF1744';
+                    ctx.shadowColor = '#FFD600';
                     ctx.shadowBlur = 16;
-                    ctx.fillStyle = 'rgba(255, 23, 68, 0.15)';
+                    ctx.fillStyle = `rgba(255, 214, 0, ${0.18 * this.opacity})`;
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, radius + 8, 0, Math.PI * 2);
                     ctx.fill();
@@ -1946,13 +1950,15 @@
                 }
 
                 // Node color based on type and fitness
-                if (this.type === 'explore' && this.appearAnimation < 0.5) {
-                    ctx.fillStyle = `rgba(255, 109, 0, ${alpha})`; // k-orange
+                if (this.isBest) {
+                    ctx.fillStyle = `rgba(255, 214, 0, ${effectiveAlpha})`; // k-yellow for best
+                } else if (this.type === 'explore' && this.appearAnimation < 0.5) {
+                    ctx.fillStyle = `rgba(255, 109, 0, ${effectiveAlpha})`; // k-orange
                 } else if (this.isElite) {
-                    ctx.fillStyle = `rgba(41, 121, 255, ${alpha})`; // k-blue
+                    ctx.fillStyle = `rgba(255, 214, 0, ${effectiveAlpha})`; // k-yellow for elite
                 } else {
                     const brightness = Math.max(0.2, this.fitness);
-                    ctx.fillStyle = `rgba(0, 0, 0, ${brightness * alpha})`;
+                    ctx.fillStyle = `rgba(0, 0, 0, ${brightness * effectiveAlpha})`;
                 }
 
                 ctx.beginPath();
@@ -1960,7 +1966,7 @@
                 ctx.fill();
 
                 // Border
-                ctx.strokeStyle = this.isBest ? '#FF1744' : `rgba(0, 0, 0, ${0.3 * alpha})`;
+                ctx.strokeStyle = this.isBest ? '#FFD600' : `rgba(0, 0, 0, ${0.3 * effectiveAlpha})`;
                 ctx.lineWidth = this.isBest ? 2 : 1;
                 ctx.stroke();
             }
@@ -2121,6 +2127,11 @@
 
         function evolveTree() {
             iteration++;
+
+            // Fade existing nodes slightly each iteration
+            nodes.forEach(n => {
+                n.opacity = Math.max(MIN_NODE_OPACITY, n.opacity - FADE_STEP);
+            });
             
             // Mandatory exploration for first 8 iterations
             if (iteration <= 8) {
